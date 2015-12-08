@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MoodMonitor</string>
+
+    <string name="rate_mood">Rate your mood</string>
+    <string name="rate_button">Submit</string>
+    <string name="action_settings">Settings</string>
+</resources>
