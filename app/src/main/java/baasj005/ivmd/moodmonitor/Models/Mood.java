@@ -7,7 +7,6 @@ import java.util.Date;
  */
 public class Mood {
     private int moodLevel;
-    private float acceleration;
     private float temperature;
     private double longitude;
     private double latitude;
@@ -18,9 +17,8 @@ public class Mood {
 
     }
 
-    public Mood(int moodLevel, float acceleration, float temperature, double longitude, double latitude, double speed) {
+    public Mood(int moodLevel, float temperature, double longitude, double latitude, double speed) {
         this.moodLevel = moodLevel;
-        this.acceleration = acceleration;
         this.temperature = temperature;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -33,14 +31,6 @@ public class Mood {
 
     public void setMoodLevel(int moodLevel) {
         this.moodLevel = moodLevel;
-    }
-
-    public float getAcceleration() {
-        return acceleration;
-    }
-
-    public void setAcceleration(float acceleration) {
-        this.acceleration = acceleration;
     }
 
     public float getTemperature() {

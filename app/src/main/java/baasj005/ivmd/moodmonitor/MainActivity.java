@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private SensorManager sensorManager;
     private LocationManager locationManager;
-    private float acceleration;
     private float temperature;
     private double longitude;
     private double latitude;
@@ -51,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             moodResource = new MoodResource();
             setLocationListener();
-            setAccelerationListener();
             setTemperatureListener();
             setScheduledNotificationTask();
             moodRatingBar = (RatingBar) findViewById(R.id.ratingBar);
@@ -100,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onResume(){
         super.onResume();
-        setAccelerationListener();
         setTemperatureListener();
         setLocationListener();
     }
@@ -112,10 +109,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), NOTIFICATION_INTERVAL, pendingIntent);
     }
 
-    private void setAccelerationListener(){
-        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-    }
 
     private void setTemperatureListener(){
         Sensor thermometer = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
@@ -132,7 +125,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private void sendMoodData(){
         Mood mood = new Mood();
-        mood.setAcceleration(acceleration);
         mood.setLatitude(latitude);
         mood.setLongitude(longitude);
         mood.setTemperature(temperature);
@@ -144,10 +136,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            acceleration = (event.values[0] + event.values[1] + event.values[2]) / 3;
-        }
-        else if(event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE){
+        if(event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE){
             temperature = event.values[0];
         }
     }
