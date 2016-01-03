@@ -3,5 +3,15 @@
 
     <string name="rate_mood">Rate your mood</string>
     <string name="rate_button">Submit</string>
+    <string name="action_mood">Rate your mood</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_rating">RatingActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="title_section1">Mood by time of day</string>
+    <string name="title_section2">Mood by temperature</string>
+    <string name="title_section3">Mood by time</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
