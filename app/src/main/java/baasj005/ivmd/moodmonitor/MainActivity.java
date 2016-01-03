@@ -3,7 +3,6 @@ package baasj005.ivmd.moodmonitor;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,6 +12,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,9 +23,10 @@ import android.widget.RatingBar;
 
 import java.util.Date;
 
-import baasj005.ivmd.moodmonitor.Models.Mood;
-import baasj005.ivmd.moodmonitor.Resources.MoodResource;
-import baasj005.ivmd.moodmonitor.ScheduledTasks.NotificationReceiver;
+import baasj005.ivmd.moodmonitor.models.Mood;
+import baasj005.ivmd.moodmonitor.tasks.MoodPostTask;
+import baasj005.ivmd.moodmonitor.notification.NotificationReceiver;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener, LocationListener {
 
@@ -35,31 +36,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private double longitude;
     private double latitude;
     private double speed;
-    private Button moodButton;
     private RatingBar moodRatingBar;
-    private MoodResource moodResource;
-    private PendingIntent pendingIntent;
-    private AlarmManager alarmManager;
-    private final int NOTIFICATION_INTERVAL = 60000;
+    private AsyncTask<Mood, Void, Response> task;
+
+    private final static int NOTIFICATION_INTERVAL = 60000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
-            sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            moodResource = new MoodResource();
-            setLocationListener();
-            setTemperatureListener();
-            setScheduledNotificationTask();
-            moodRatingBar = (RatingBar) findViewById(R.id.ratingBar);
-            moodButton = (Button) findViewById(R.id.moodButton);
-            moodButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    sendMoodData();
-                }
-            });
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        setLocationListener();
+        setTemperatureListener();
+        setScheduledNotificationTask();
+
+        moodRatingBar = (RatingBar) findViewById(R.id.ratingBar);
+        Button moodButton = (Button) findViewById(R.id.moodButton);
+
+        moodButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                task = new MoodPostTask().execute(getMoodData());
+            }
+        });
     }
 
     @Override
@@ -85,58 +87,58 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         try {
             super.onPause();
             sensorManager.unregisterListener(this);
             locationManager.removeUpdates(this);
-        }catch(SecurityException ex){
+        } catch (SecurityException ex) {
             ex.printStackTrace();
         }
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         setTemperatureListener();
         setLocationListener();
     }
 
-    private void setScheduledNotificationTask(){
+    private void setScheduledNotificationTask() {
         Intent notificationIntent = new Intent(this, NotificationReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
-        alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), NOTIFICATION_INTERVAL, pendingIntent);
     }
 
 
-    private void setTemperatureListener(){
+    private void setTemperatureListener() {
         Sensor thermometer = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
         sensorManager.registerListener(this, thermometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    private void setLocationListener(){
+    private void setLocationListener() {
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, Criteria.ACCURACY_FINE, this);
-        }catch(SecurityException ex){
+        } catch (SecurityException ex) {
             ex.printStackTrace();
         }
     }
 
-    private void sendMoodData(){
+    private Mood getMoodData() {
         Mood mood = new Mood();
         mood.setLatitude(latitude);
         mood.setLongitude(longitude);
         mood.setTemperature(temperature);
         mood.setSpeed(speed);
         mood.setMoodLevel(moodRatingBar.getNumStars());
-        mood.setMoodDate(new Date());
-        moodResource.doRestPost(mood);
+        mood.setMoodDate(new Date().getTime());
+        return mood;
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE){
+        if (event.sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE) {
             temperature = event.values[0];
         }
     }
@@ -167,4 +169,5 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onProviderDisabled(String provider) {
 
     }
+
 }

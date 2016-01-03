@@ -1,4 +1,4 @@
-package baasj005.ivmd.moodmonitor.ScheduledTasks;
+package baasj005.ivmd.moodmonitor.notification;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;

@@ -1,4 +1,4 @@
-package baasj005.ivmd.moodmonitor.Models;
+package baasj005.ivmd.moodmonitor.models;
 
 import java.util.Date;
 
@@ -11,8 +11,7 @@ public class Mood {
     private double longitude;
     private double latitude;
     private double speed;
-    private Date moodDate;
-
+    private Long moodDate;
     public Mood(){
 
     }
@@ -65,11 +64,11 @@ public class Mood {
         this.speed = speed;
     }
 
-    public void setMoodDate(Date moodDate){
+    public void setMoodDate(Long moodDate){
         this.moodDate = moodDate;
     }
 
-    public Date getMoodDate(){
+    public Long getMoodDate(){
         return this.moodDate;
     }
 }
