@@ -6,7 +6,7 @@ import java.util.Date;
  * Created by Jesse on 8-12-2015.
  */
 public class Mood {
-    private int moodLevel;
+    private float moodLevel;
     private float temperature;
     private double longitude;
     private double latitude;
@@ -16,7 +16,7 @@ public class Mood {
 
     }
 
-    public Mood(int moodLevel, float temperature, double longitude, double latitude, double speed) {
+    public Mood(float moodLevel, float temperature, double longitude, double latitude, double speed) {
         this.moodLevel = moodLevel;
         this.temperature = temperature;
         this.longitude = longitude;
@@ -24,11 +24,11 @@ public class Mood {
         this.speed = speed;
     }
 
-    public int getMoodLevel() {
+    public float getMoodLevel() {
         return moodLevel;
     }
 
-    public void setMoodLevel(int moodLevel) {
+    public void setMoodLevel(float moodLevel) {
         this.moodLevel = moodLevel;
     }
 
@@ -70,5 +70,13 @@ public class Mood {
 
     public Long getMoodDate(){
         return this.moodDate;
+    }
+
+    public int compareDate(Mood mood){
+        Date thisDate = new Date();
+        Date moodDate = new Date();
+        thisDate.setTime(this.getMoodDate());
+        moodDate.setTime(mood.getMoodDate());
+        return thisDate.compareTo(moodDate);
     }
 }
